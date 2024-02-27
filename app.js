@@ -7,6 +7,7 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
+const compression = require('compression');
 const errorHandler = require('./controllers/errorController');
 const AppError = require('./util/appError');
 const tourRout = require('./routes/toursRoutes');
@@ -54,6 +55,7 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(compression());
 //const users = JSON.parse(fs.readFileSync(`${__dirname}/dev-data/data/users.json`));
 app.get('/', (req, res) => {
   res.status(200).render('base');
