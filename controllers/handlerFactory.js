@@ -5,7 +5,7 @@ const AppError = require('../util/appError');
 
 exports.deleteOne = (Model) =>
     catchAsync(async (req, res, next) => {
-        const doc = Model.findByIdAndDelete(req.params.id);
+        const doc = await Model.findByIdAndDelete(req.params.id);
         if (!doc) return next(new AppError('the document is not Found', 404));
         res.status(204).json({
             message: 'Successful Delete',
@@ -69,7 +69,7 @@ exports.getAll = (Model) =>
             .sorting()
             .page()
             .fieldLimit();
-        const doc = await feature.query.explain();
+        const doc = await feature.query;
         res.status(200).json({
             message: 'Successful read',
             data: {

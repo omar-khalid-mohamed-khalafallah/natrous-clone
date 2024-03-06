@@ -1,3 +1,4 @@
+// Description: User controller for handling user related operations.
 const catchAsync = require('../util/catchAsync');
 const AppError = require('../util/appError');
 const User = require('../models/userModel');
@@ -7,20 +8,14 @@ const filterBody = function (obj, ...allowedFields) {
   const newObj = {};
   Object.keys(obj).forEach((ele) => {
     if (allowedFields.includes(ele)) newObj[ele] = obj[ele];
-    return newObj;
   });
+  return newObj;
 };
 
 exports.createUser = (req, res) => {
   res.status(500).json({
     status: 'error',
     message: 'do not use this route GO TO /signup',
-  });
-};
-
-exports.updateUser = (req, res) => {
-  res.status(200).json({
-    message: 'Successful read',
   });
 };
 
@@ -42,7 +37,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     runValidators: true,
   });
   res.status(200).json({
-    message: 'Successful read',
+    message: 'Successful update',
     data: {
       user: updatedUser,
     },
@@ -53,13 +48,14 @@ exports.getMe = (req, res, next) => {
   next();
 };
 exports.deleteMe = catchAsync(async (req, res, next) => {
-  await User.findByIdAndUpdate(req.user.id, { active: false });
-
+  const user = await User.findByIdAndUpdate(req.user.id, { active: false });
+  console.log(user);
   res.status(204).json({
     status: 'success',
     data: null,
   });
 });
+exports.updateUser = handlerFactory.updateOne(User);
 exports.getAllUsers = handlerFactory.getAll(User);
 exports.getUser = handlerFactory.getOne(User);
 exports.deleteUser = handlerFactory.deleteOne(User);

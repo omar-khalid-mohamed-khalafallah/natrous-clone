@@ -1,12 +1,15 @@
 /* eslint-disable */
-import axios from 'axios';
+/* eslint-env es6 */
+/* eslint-disable no-unused-vars */
+
+// import axios from 'axios';
 import { showAlert } from './alerts';
 
 export const login = async (email, password) => {
     try {
         const res = await axios({
             method: 'POST',
-            url: '/api/v1/users/login',
+            url: 'http://127.0.0.1:3001/api/v1/users/login',
             data: {
                 email,
                 password

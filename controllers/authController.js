@@ -26,6 +26,14 @@ const createTOkenRespond = function (user, statuscode, res) {
     data: user,
   });
 };
+//logout
+exports.logout = (req, res) => {
+  res.cookie('token', 'loggedout', {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+  });
+  res.status(200).json({ status: 'success' });
+};
 //signup
 exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create(req.body);

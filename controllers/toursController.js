@@ -94,9 +94,13 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
     },
   })
 });
-//'/tour-within/:distance/center/:30.595623, 32.262002/unit/:unit'
+//'/tour-within/300/center/:30.595623, 32.262002/unit/mi'
 exports.getTourWithin = catchAsync(async (req, res, next) => {
   const { distance, latLng, unit } = req.params
+  if (!latLng) {
+    next(new AppError('Please provide latLng.', 400));
+    return;
+  }
   const [lat, lng] = latLng.split(',');
   const radius = unit === 'mi' ? distance / 3963.2 : distance / 6378.1;
   if (!lat || !lng) {
@@ -113,34 +117,44 @@ exports.getTourWithin = catchAsync(async (req, res, next) => {
     }
   });
 });
-
 exports.getDistance = catchAsync(async (req, res, next) => {
-  const { latLng, unit } = req.params
+  const { latLng, unit } = req.params;
   const [lat, lng] = latLng.split(',');
-  const multiplier = unit === 'mi' ? 0.000621371192 : 0.001;
+
+  const multiplier = unit === 'mi' ? 0.000621371 : 0.001;
+
   if (!lat || !lng) {
-    next(new AppError('please provide lat - lng', 400));
+    next(
+      new AppError(
+        'Please provide latitutr and longitude in the format lat,lng.',
+        400
+      )
+    );
   }
-  const distance = await Tour.aggregate([
+
+  const distances = await Tour.aggregate([
     {
       $geoNear: {
         near: {
           type: 'Point',
-          coordinates: [lat * 1, lng * 1],
+          coordinates: [lng * 1, lat * 1]
         },
         distanceField: 'distance',
-        distanceMultiplier: multiplier,
-      },
+        distanceMultiplier: multiplier
+      }
+    },
+    {
       $project: {
-        name: 1,
-        distance: 1
-      },
+        distance: 1,
+        name: 1
+      }
     }
   ]);
+
   res.status(200).json({
-    message: 'success',
+    status: 'success',
     data: {
-      distance,
+      data: distances
     }
   });
 });

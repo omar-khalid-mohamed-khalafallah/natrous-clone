@@ -34,9 +34,7 @@ const tourSchema = new mongoose.Schema(
       default: 4.5,
       min: 1,
       max: 5,
-      set: (val) => {
-        Math.round(val * 10) / 10;
-      },
+      set: (val) => Math.round(val * 10) / 10,
     },
     ratingsQuantity: {
       type: Number,
@@ -103,7 +101,7 @@ const tourSchema = new mongoose.Schema(
     toObject: { virtuals: true },
   },
 );
-tourSchema.index({ startLocation: '2dsphere' });
+tourSchema.index({ 'startLocation.coordinates': '2dsphere' });
 //embeded documents
 // tourSchema.pre('save', async function (next) {
 //   const guidesPromises = this.guides.map(async (id) => await User.findById(id));
@@ -117,6 +115,10 @@ tourSchema.virtual('reviews', {
   foreignField: 'tour',
   localField: '_id',
 });
+tourSchema.pre('save', function (next) {
+  this.slug = slugify(this.name, { lower: true });
+  next();
+});
 tourSchema.pre('/^find/', function (next) {
   this.populate({
     path: 'guides',
@@ -124,10 +126,7 @@ tourSchema.pre('/^find/', function (next) {
   });
   next();
 });
-tourSchema.pre('save', function (next) {
-  this.slug = slugify(this.name, { lower: true });
-  next();
-});
+
 
 tourSchema.pre(/^find/, function (next) {
   this.find({ secretTour: { $ne: true } });
